@@ -21,6 +21,7 @@ export default function AssignmentRoutes(app) {
           _id: new Date().getTime().toString(),
         };
         Database.assignments.push(newAssignment);
+        res.sendStatus(205);
     });
 
     app.get("/api/courses/:cid/assignments", (req, res) => {
