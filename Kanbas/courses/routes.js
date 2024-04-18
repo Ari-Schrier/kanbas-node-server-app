@@ -1,43 +1,48 @@
+import * as dao from "./dao.js";
 import Database from "../Database/index.js";
 
 export default function CourseRoutes(app) {
 
-  app.get("/api/courses/:id", (req, res) => {
-    const { id } = req.params;
-    const course = Database.courses
-      .find((c) => c._id === id);
-    if (!course) {
+  const findCourse = async(req, res) => {
+    const {id} = req.params;
+    const currentCourse = await dao.findCourseById(id);
+    if (!currentCourse) {
       res.status(404).send("Course not found");
       return;
     }
-    res.send(course);
-  });
-
-  app.put("/api/courses/:id", (req, res) => {
+    res.json(currentCourse);
+  };
+  const updateCourse = async(req, res) => {
     const { id } = req.params;
     const course = req.body;
-    Database.courses = Database.courses.map((c) =>
-      c._id === id ? { ...c, ...course } : c
-    );
+    await dao.updateCourse(id, course);
     res.sendStatus(204);
-  });
-
-  app.delete("/api/courses/:id", (req, res) => {
+  };
+  const deleteCourse = async(req, res) => {
     const { id } = req.params;
-    Database.courses = Database.courses
-      .filter((c) => c._id !== id);
+    await dao.deleteCourse(id);
     res.sendStatus(204);
-  });
-
-  app.post("/api/courses", (req, res) => {
+  };
+  const createCourse = async(req, res) => {
     const course = { ...req.body,
-      _id: new Date().getTime().toString() };
-    Database.courses.push(course);
-    res.send(course);
-  });
+      id: new Date().getTime().toString() };
+    delete course._id;
+    await dao.createCourse(course);
+    const newCourse = await dao.findCourseByNumber(course.number);
+    res.send(newCourse);
+  };
+  const getCourses = async(req, res) => {
+    const courses = await dao.findAllCourses();
+    res.json(courses);
+  };
 
-  app.get("/api/courses", (req, res) => {
-    const courses = Database.courses;
-    res.send(courses);
-  });
+  app.get("/api/courses/:id", findCourse);
+
+  app.put("/api/courses/:id", updateCourse);
+
+  app.delete("/api/courses/:id", deleteCourse);
+
+  app.post("/api/courses", createCourse);
+
+  app.get("/api/courses", getCourses);
 }
