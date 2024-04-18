@@ -28,7 +28,7 @@ export default function CourseRoutes(app) {
       id: new Date().getTime().toString() };
     delete course._id;
     await dao.createCourse(course);
-    const newCourse = await dao.findCourseByNumber(course.number);
+    newCourse = await dao.findCourseByNumber(course.number);
     res.send(newCourse);
   };
   const getCourses = async(req, res) => {
