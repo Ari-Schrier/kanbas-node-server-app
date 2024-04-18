@@ -47,7 +47,10 @@ export default function UserRoutes(app) {
   };
   const profile = async (req, res) => {
     const currentUser = req.session["currentUser"];
+    console.log("Session data at profile:", req.session);
+    console.log(req.session["currentUser"]);
     if (!currentUser) {
+      console.log("The problem is here");
       res.sendStatus(401);
       return;
     }
@@ -56,9 +59,11 @@ export default function UserRoutes(app) {
   const signin = async (req, res) => {
     const { username, password } = req.body;
     const currentUser = await dao.findUserByCredentials(username, password);
-    console.log(currentUser);
     if (currentUser) {
       req.session["currentUser"] = currentUser;
+      console.log("signin setting:");
+      console.log(req.session["currentUser"]);
+      console.log("Session data after sign-in:", req.session);
       res.json(currentUser);
     } else {
       res.sendStatus(401);

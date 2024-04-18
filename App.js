@@ -17,6 +17,7 @@ app.use(
         origin: process.env.FRONTEND_URL
       })
 );
+console.log(process.env.SESSION_SECRET);
 const sessionOptions = {
     secret: process.env.SESSION_SECRET,
     resave: false,
